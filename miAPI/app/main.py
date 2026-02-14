@@ -1,5 +1,5 @@
 #Importaciones
-from fastapi import FastAPI
+from fastapi import FastAPI, status, HTTPException
 import asyncio 
 from typing import Optional 
 
@@ -29,11 +29,11 @@ async def hola():
         "estatus": "200"
     }
 
-@app.get("/v1/usuario/{id}", tags=['Parametro Obligatorio'])
+@app.get("/v1/parametroOb/{id}", tags=['Parametro Obligatorio'])
 async def consultaUno(id:int):
     return {"Se encontro usuario": id}
 
-@app.get("/v1/usuarios/", tags=['Parametro opcional'])
+@app.get("/v1/parametroOp/", tags=['Parametro opcional'])
 async def consultaTodos(id: Optional[int]= None):
     if id is not None:
         for usuario in usuarios:
@@ -42,3 +42,39 @@ async def consultaTodos(id: Optional[int]= None):
         return{"mensaje":"usuario no encontrado", "usuario": id}
     else:
         return{"mensaje":"No se proporciono id"}
+
+
+@app.get("/v1/usuarios/", tags=['CRUD HTTP'])
+async def leer_usuarios():
+    return{
+        "status":"200",
+        "total": len(usuarios), 
+        "usuarios":usuarios
+    }
+
+
+@app.post("/v1/usuarios/", tags=['CRUD HTTP'],status_code=status.HTTP)
+async def crear_usuario(usuario:dict):
+    for usr in usuarios:
+        if usr["id"] == usuario.get("id"):
+            raise HTTPException(
+                status_code=400,
+                detail="El id ya existe"
+            )
+    usuarios.append(usuario)
+    return{
+        "mensaje":"Usuario Agregado",
+        "Usuario":usuario
+    }
+    
+
+@app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'])
+async def actualizar_usuario(id: int, usuario: dict):
+    for usr in usuarios:
+        if usr["id"] == id: 
+            usr.update(usuario)
+            return {"mensaje": "Usuario actualizado", "usuario": usr}
+
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+
