@@ -53,7 +53,7 @@ async def leer_usuarios():
     }
 
 
-@app.post("/v1/usuarios/", tags=['CRUD HTTP'],status_code=status.HTTP)
+@app.post("/v1/usuarios/",tags=["CRUD HTTP"],status_code=status.HTTP_201_CREATED)
 async def crear_usuario(usuario:dict):
     for usr in usuarios:
         if usr["id"] == usuario.get("id"):
@@ -66,7 +66,7 @@ async def crear_usuario(usuario:dict):
         "mensaje":"Usuario Agregado",
         "Usuario":usuario
     }
-    
+
 
 @app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'])
 async def actualizar_usuario(id: int, usuario: dict):
@@ -78,3 +78,11 @@ async def actualizar_usuario(id: int, usuario: dict):
     raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
 
+@app.delete("/v1/usuarios/{id}", tags=['CRUD HTTP'])
+async def eliminar_usuario(id: int):
+    for usr in usuarios:
+        if usr["id"] == id:
+            usuarios.remove(usr)
+            return {"mensaje": "Usuario eliminado", "usuario": usr}
+
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
