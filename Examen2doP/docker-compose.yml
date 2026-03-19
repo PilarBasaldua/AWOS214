@@ -1,8 +1,8 @@
-services: 
+services:
   api:
     build: .
-    container_name: Examen 2 parcial 
+    container_name: examen2_parcial
     ports:
-        "5000:5000"
+      - "5000:5000"
     volumes:
-        ./app:/app/app
+      - ./app:/app/app
